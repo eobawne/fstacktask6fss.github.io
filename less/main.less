@@ -1,0 +1,765 @@
+// Variables
+@accent: #3379d4;
+@text: #ffffff;
+@muted: #647895;
+@font-base: 'Segoe UI', Arial, Helvetica, sans-serif;
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-width: 320px;
+    color: @text;
+    background: linear-gradient(
+        180deg,
+        #0A2345 0%,
+        #092140 18%,
+        #091d37 38%,
+        #07162D 58%,
+        #040f1d 78%,
+        #020106 100%
+    );
+    background-repeat: no-repeat;
+    font-family: @font-base;
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font: inherit;
+}
+
+h1, h2, h3, p {
+    margin-top: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+// Button Style
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 145px;
+    height: 42px;
+    padding: 0 26px;
+    border: 1px solid rgba(51, 121, 212, .6);
+    border-radius: 25px;
+    background: rgba(14, 38, 70, .5);
+    color: @text;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    transition: all .25s ease;
+
+    &:hover {
+        background: @accent;
+        border-color: #3379d5;
+        box-shadow: 0 0 18px #3379d473;
+    }
+}
+
+// ----------------------------------------------------
+// HEADER & HERO
+// ----------------------------------------------------
+.header {
+    position: relative;
+    padding-bottom: 70px;
+    overflow: hidden;
+
+    &__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 36px;
+    }
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: @text;
+    font-size: 20px;
+    font-weight: 700;
+
+    img {
+        width: 34px;
+        height: auto;
+    }
+}
+
+.menu-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 28px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+
+    span {
+        display: block;
+        width: 100%;
+        height: 2px;
+        border-radius: 2px;
+        background: @accent;
+    }
+}
+
+.hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 75px;
+    text-align: center;
+
+    &__content {
+        max-width: 620px;
+        padding: 0 0 4em 0;
+
+        h1 {
+            margin-bottom: 16px;
+            font-size: 38px;
+            font-weight: 300;
+
+            span {
+                color: @accent;
+                font-weight: 600;
+            }
+        }
+
+        p {
+            max-width: 530px;
+            margin: 0 auto 30px;
+            color: @muted;
+            font-size: 14px;
+        }
+    }
+
+    &__showcase {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: 60px;
+    }
+
+    // Звуковая волна выходит далеко за границы контейнера
+    &__wave {
+        position: absolute;
+        top: 48%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100vw;
+        min-width: 1450px;
+        max-width: 1450px;
+        z-index: 1;
+        opacity: 1;
+        pointer-events: none;
+        display: flex;
+        justify-content: center;
+
+        img {
+            width: 100%;
+            height: 80%;
+        }
+    }
+
+    &__screens {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 35px;
+    }
+}
+
+.screen {
+    position: relative;
+    flex: 0 0 240px;
+
+    img {
+        width: 100%;
+        height: auto;
+    }
+
+    &--left {
+        z-index: 2;
+        transform: scale(.88);
+        transform-origin: center;
+    }
+
+    &--center {
+        z-index: 3;
+        transform: translateY(0);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, .5);
+    }
+
+    &--right {
+        z-index: 2;
+        transform: scale(.88);
+        transform-origin: center;
+    }
+}
+
+// ----------------------------------------------------
+// SECTION: HEADPHONES PROMO
+// ----------------------------------------------------
+.headphones-promo {
+    padding: 100px 0 120px;
+
+    &__layout {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 50px;
+    }
+
+    &__image {
+        flex: 1 1 50%;
+
+        img {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+    }
+
+    &__content {
+        flex: 1 1 45%;
+
+        h2 {
+            margin-bottom: 22px;
+            font-size: 32px;
+            font-weight: 300;
+
+            span {
+                color: @accent;
+                font-weight: 600;
+            }
+        }
+
+        p {
+            max-width: 450px;
+            margin-bottom: 30px;
+            color: @muted;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+    }
+}
+
+// ----------------------------------------------------
+// SECTION: FEATURES GRID (С телефоном и двойным свечением)
+// ----------------------------------------------------
+.features-grid {
+    padding: 60px 0 110px;
+
+    &__title {
+        margin-bottom: 75px;
+        text-align: center;
+        font-size: 32px;
+        font-weight: 300;
+
+        span {
+            color: @accent;
+            font-weight: 600;
+        }
+    }
+
+    &__body {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 30px;
+    }
+
+    &__col {
+        flex: 1 1 33%;
+        display: flex;
+        flex-direction: column;
+        gap: 35px;
+    }
+
+    &__phone {
+        flex: 0 0 290px;
+        display: flex;
+        justify-content: center;
+    }
+
+    &__phone-wrap {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 275px;
+
+        // 1. Падающая тень от телефона, распространяющаяся на оба круга
+        &::after {
+            content: "";
+            position: absolute;
+            bottom: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 320px;
+            height: 65px;
+            border-radius: 50%;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(0, 0, 0, 0.623) 0%,
+                rgba(2, 8, 18, 0.377) 45%,
+                transparent 75%
+            );
+            z-index: 2; // Над эллипсами, но под самим телефоном
+            pointer-events: none;
+            filter: blur(2px);
+        }
+    }
+
+    &__device {
+        position: relative;
+        z-index: 3; // Поверх тени и эллипсов
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(0 5px 10px rgba(0, 0, 0, .6));
+    }
+
+    // Контейнер эллипсов
+    &__glow-wrap {
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 520px;
+        height: 110px;
+        z-index: 1;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    // Базовые стили эллипса
+    &__ellipse {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        pointer-events: none;
+
+        // Индивидуальная тень на каждом круге: перекрывает и заливку, и контур снизу
+        &::after {
+            content: "";
+            position: absolute;
+            inset: -2px; // Заходит на 1.5px границу, чтобы приглушить ее
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        // Внешний эллипс
+        &--outer {
+            width: 100%;
+            height: 80px;
+            border: 1.5px solid rgba(35, 105, 195, .55);
+            background: radial-gradient(ellipse at center, rgba(10, 30, 58, .7) 0%, rgba(10, 30, 58, .25) 65%, transparent 85%);
+            box-shadow: 
+                0 -4px 40px rgba(25, 90, 185, .35),
+                inset 0 0 0px rgba(10, 30, 58, .8);
+
+            // Собственное затемнение нижней части внешнего круга
+            &::after {
+                background: linear-gradient(
+                    180deg,
+                    transparent 15%,
+                    rgba(3, 9, 18, 0.603) 40%,
+                    rgba(2, 6, 14, 0.336) 70%,
+                    rgba(4, 12, 24, 0.068) 100%
+                );
+            }
+        }
+
+        // Внутренний эллипс
+        &--inner {
+            width: 73%;
+            height: 40px;
+            border: 1.5px solid rgba(45, 125, 225, .75);
+            background: radial-gradient(ellipse at center, rgba(14, 42, 80, .75) 0%, rgba(10, 30, 58, .35) 65%, transparent 85%);
+            box-shadow: 
+                0 3px 10px rgba(35, 115, 220, .45),
+                inset 0 0 6px rgba(14, 42, 80, .7);
+
+            // Собственное затемнение нижней части внутреннего круга
+            &::after {
+                background: linear-gradient(
+                    180deg,
+                    transparent 10%,
+                    rgba(3, 9, 18, 0.603) 40%,
+                    rgba(2, 6, 14, 0.336) 70%,
+                    rgba(4, 12, 24, 0.068) 100%
+                );
+            }
+        }
+    }
+}
+
+// Карточка одной фичи (иконка СВЕРХУ)
+.feature-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+
+    &__icon {
+        width: 38px;
+        height: 38px;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    }
+
+    h3 {
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        color: @text;
+    }
+
+    p {
+        margin: 0;
+        color: @muted;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+}
+
+// ----------------------------------------------------
+// SECTION: FEATURES PERSPECTIVE
+// ----------------------------------------------------
+.perspective-section {
+    padding: 90px 0 120px;
+
+    &__layout {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 60px;
+    }
+
+    &__content {
+        flex: 1 1 45%;
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        p {
+            max-width: 440px;
+            color: @muted;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+    }
+
+    &__icon {
+        margin-bottom: 25px;
+
+        img {
+            width: 32px;
+            height: auto;
+        }
+    }
+
+    &__image {
+        flex: 1 1 55%;
+
+        img {
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+        }
+    }
+}
+
+// ----------------------------------------------------
+// SECTION: OPINIONS (Фон с руками Layer 11, аватар Layer 10)
+// ----------------------------------------------------
+.opinions {
+    padding: 95px 0 100px;
+    text-align: center;
+    // Выделенный контрастный фон с картинкой печатающих рук Layer 11
+    background:
+        linear-gradient(rgba(7, 24, 48, .88), rgba(7, 24, 48, .88)),
+        url("../assets/Opinions/Photo/Layer%2011.png") center / cover no-repeat;
+    border-top: 1px solid rgba(255, 255, 255, .05);
+    border-bottom: 1px solid rgba(255, 255, 255, .05);
+
+    &__content {
+        max-width: 680px;
+        margin: 0 auto;
+    }
+
+    &__quote {
+        margin-bottom: 28px;
+        font-size: 18px;
+        font-weight: 300;
+        line-height: 1.75;
+        color: #d1dceb;
+    }
+
+    &__author {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 32px;
+        color: @muted;
+        font-size: 13px;
+
+        img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, .1);
+        }
+    }
+
+    &__bullets {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+
+        .bullet {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2a3d58;
+
+            &.active {
+                background: @accent;
+            }
+        }
+    }
+}
+
+// ----------------------------------------------------
+// SECTION: DOWNLOAD APP
+// ----------------------------------------------------
+.download-section {
+    padding: 85px 0 110px;
+    text-align: center;
+
+    &__content {
+        max-width: 600px;
+        margin: 0 auto 55px;
+
+        h2 {
+            margin-bottom: 14px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        p {
+            max-width: 490px;
+            margin: 0 auto;
+            color: @muted;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+    }
+
+    &__screens {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        margin-bottom: 45px;
+    }
+
+    &__action {
+        display: flex;
+        justify-content: center;
+    }
+}
+
+// ----------------------------------------------------
+// FOOTER
+// ----------------------------------------------------
+.footer {
+    padding: 26px 0 32px;
+    border-top: 1px solid rgba(255, 255, 255, .07);
+
+    &__inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: @muted;
+        font-size: 11px;
+    }
+
+    &__links {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+
+        a {
+            transition: color .2s ease;
+
+            &:hover {
+                color: @text;
+            }
+        }
+    }
+
+    &__copyright {
+        margin: 0;
+    }
+}
+
+// ----------------------------------------------------
+// ADAPTIVE / MEDIA QUERIES
+// ----------------------------------------------------
+@media (max-width: 960px) {
+    .headphones-promo__layout {
+        gap: 30px;
+    }
+
+    .features-grid__body {
+        gap: 20px;
+    }
+
+    .features-grid__phone {
+        flex: 0 0 230px;
+    }
+
+    .features-grid__glow-wrap {
+        width: 380px;
+    }
+
+    .perspective-section__layout {
+        gap: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .headphones-promo__layout {
+        flex-direction: column;
+        text-align: center;
+
+        p {
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+    .features-grid__body {
+        flex-direction: column;
+        align-items: center;
+        gap: 45px;
+    }
+
+    .features-grid__col {
+        width: 100%;
+        max-width: 440px;
+        gap: 35px;
+    }
+
+    .feature-card {
+        align-items: center;
+        text-align: center;
+    }
+
+    .features-grid__phone {
+        order: -1;
+    }
+
+    .perspective-section__layout {
+        flex-direction: column;
+        text-align: center;
+
+        .perspective-section__icon {
+            display: flex;
+            justify-content: center;
+        }
+
+        p {
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+
+    .hero__screens {
+        gap: 15px;
+    }
+
+    .screen {
+        flex: 0 0 170px;
+
+        &--left,
+        &--right {
+            transform: scale(.88);
+        }
+    }
+}
+
+@media (max-width: 540px) {
+    .hero__content h1 {
+        font-size: 28px;
+    }
+
+    .screen {
+        flex: 0 0 140px;
+
+        &--left,
+        &--right {
+            display: none;
+        }
+    }
+
+    .footer__inner {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+
+    .footer__links {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 14px 18px;
+    }
+}
