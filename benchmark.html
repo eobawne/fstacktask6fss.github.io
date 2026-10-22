@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель эксперимента: Анализ производительности</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f1f5f9; color: #1e293b; margin: 0; padding: 24px; }
+        .container { max-width: 1050px; margin: 0 auto; }
+        .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,.1); margin-bottom: 20px; }
+        h1 { margin-top: 0; font-size: 22px; color: #0f172a; }
+        .controls { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 15px; }
+        label { font-weight: 600; font-size: 14px; }
+        input[type="number"] { width: 70px; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; }
+        .btn { padding: 8px 18px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: .2s; }
+        .btn--primary { background: #2563eb; color: #fff; }
+        .btn--primary:hover:not(:disabled) { background: #1d4ed8; }
+        .btn--success { background: #16a34a; color: #fff; }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+        .status { margin-left: auto; font-weight: 600; color: #64748b; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        th, td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        th { background: #f8fafc; color: #475569; }
+        .text-bold { font-weight: 700; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        .badge--fast { background: #dcfce7; color: #15803d; }
+        .badge--slow { background: #fee2e2; color: #b91c1c; }
+        #benchFrame { width: 1px; height: 1px; border: 0; position: absolute; left: -9999px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1>Сравнительный анализ производительности (GitHub Pages)</h1>
+        
+        <div class="controls">
+            <label for="runsInput">Количество прогонов каждого варианта:</label>
+            <input type="number" id="runsInput" value="5" min="1" max="20">
+
+            <button id="btnRun" class="btn btn--primary">Начать эксперимент</button>
+            <button id="btnExport" class="btn btn--success" disabled>Экспорт в .CSV</button>
+            <span id="status" class="status">Ожидание запуска</span>
+        </div>
+    </div>
+
+    <!-- Таблица средних значений -->
+    <div class="card">
+        <h2>Итоговая сравнительная таблица (средние значения)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Конфигурация</th>
+                    <th>Препроцессор</th>
+                    <th>Верстка</th>
+                    <th>Формирование DOM (мс)</th>
+                    <th>Полная загрузка / Load (мс)</th>
+                </tr>
+            </thead>
+            <tbody id="summaryBody">
+                <tr><td colspan="5" style="text-align: center; color: #94a3b8;">Запустите тест для формирования статистики...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Лог всех прогонов -->
+    <div class="card">
+        <h3>Подробный лог замеров</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Вариант</th>
+                    <th>Прогон</th>
+                    <th>DOMContentLoaded (мс)</th>
+                    <th>Load Event (мс)</th>
+                </tr>
+            </thead>
+            <tbody id="logBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<iframe id="benchFrame" title="Тестовый контейнер"></iframe>
+
+<script>
+(function() {
+    'use strict';
+
+    const TASKS = [
+        { id: 'desktop-css', name: 'Desktop Pure CSS', preprocessor: 'Нет (скомпилирован)', layout: 'Десктоп', file: 'desktop-css.html' },
+        { id: 'adaptive-css', name: 'Adaptive Pure CSS', preprocessor: 'Нет (скомпилирован)', layout: 'Адаптивная', file: 'adaptive-css.html' },
+        { id: 'desktop-less', name: 'Desktop Client LESS', preprocessor: 'Да (less.js в браузере)', layout: 'Десктоп', file: 'desktop-less.html' },
+        { id: 'adaptive-less', name: 'Adaptive Client LESS', preprocessor: 'Да (less.js в браузере)', layout: 'Адаптивная', file: 'adaptive-less.html' }
+    ];
+
+    const frame = document.getElementById('benchFrame');
+    const btnRun = document.getElementById('btnRun');
+    const btnExport = document.getElementById('btnExport');
+    const statusEl = document.getElementById('status');
+    const summaryBody = document.getElementById('summaryBody');
+    const logBody = document.getElementById('logBody');
+    const runsInput = document.getElementById('runsInput');
+
+    let rawResults = [];
+    let summaryResults = [];
+    let logCounter = 1;
+
+    function wait(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Загрузка страницы в iframe и чтение нативных метрик браузера
+    function measurePage(url) {
+        return new Promise((resolve, reject) => {
+            frame.onload = () => {
+                // Небольшая пауза для завершения события load в PerformanceNavigationTiming
+                setTimeout(() => {
+                    try {
+                        const win = frame.contentWindow;
+                        const [navEntry] = win.performance.getEntriesByType('navigation');
+
+                        if (navEntry && navEntry.loadEventEnd > 0) {
+                            resolve({
+                                dcl: navEntry.domContentLoadedEventEnd,
+                                load: navEntry.loadEventEnd
+                            });
+                        } else {
+                            // Резервный замер через performance.timing
+                            const t = win.performance.timing;
+                            resolve({
+                                dcl: t.domContentLoadedEventEnd - t.navigationStart,
+                                load: t.loadEventEnd - t.navigationStart
+                            });
+                        }
+                    } catch (e) {
+                        reject(e);
+                    }
+                }, 100);
+            };
+
+            // Добавляем timestamp для обхода кэша браузера
+            frame.src = url + '?t=' + Date.now();
+        });
+    }
+
+    async function startExperiment() {
+        const runsPerTask = parseInt(runsInput.value, 10) || 5;
+        rawResults = [];
+        summaryResults = [];
+        logCounter = 1;
+        logBody.innerHTML = '';
+        summaryBody.innerHTML = '';
+
+        btnRun.disabled = true;
+        btnExport.disabled = true;
+
+        for (const task of TASKS) {
+            const taskTimes = { dcl: [], load: [] };
+
+            for (let i = 1; i <= runsPerTask; i++) {
+                statusEl.textContent = `Тестирование: ${task.name} (${i}/${runsPerTask})...`;
+
+                try {
+                    const metrics = await measurePage(task.file);
+                    taskTimes.dcl.push(metrics.dcl);
+                    taskTimes.load.push(metrics.load);
+
+                    rawResults.push({
+                        task: task.name,
+                        run: i,
+                        dcl: metrics.dcl,
+                        load: metrics.load
+                    });
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${logCounter++}</td>
+                        <td>${task.name}</td>
+                        <td>${i}</td>
+                        <td>${metrics.dcl.toFixed(1)}</td>
+                        <td>${metrics.load.toFixed(1)}</td>
+                    `;
+                    logBody.appendChild(tr);
+
+                    await wait(300); // Пауза между прогонами для стабилизации сети
+                } catch (err) {
+                    console.error('Ошибка замера:', err);
+                }
+            }
+
+            const avgDcl = taskTimes.dcl.reduce((a, b) => a + b, 0) / taskTimes.dcl.length;
+            const avgLoad = taskTimes.load.reduce((a, b) => a + b, 0) / taskTimes.load.length;
+
+            summaryResults.push({
+                ...task,
+                avgDcl,
+                avgLoad
+            });
+        }
+
+        renderSummaryTable();
+        statusEl.textContent = 'Эксперимент завершен!';
+        btnRun.disabled = false;
+        btnExport.disabled = false;
+    }
+
+    function renderSummaryTable() {
+        summaryBody.innerHTML = '';
+
+        summaryResults.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="text-bold">${item.name}</td>
+                <td>${item.preprocessor}</td>
+                <td>${item.layout}</td>
+                <td>${item.avgDcl.toFixed(2)} мс</td>
+                <td>${item.avgLoad.toFixed(2)} мс</td>
+            `;
+            summaryBody.appendChild(tr);
+        });
+    }
+
+    function exportToCSV() {
+        if (summaryResults.length === 0) return;
+
+        const headers = ['Конфигурация', 'Препроцессор', 'Верстка', 'Формирование DOM (мс)', 'Полная загрузка (мс)'];
+        const rows = summaryResults.map(r => [
+            `"${r.name}"`,
+            `"${r.preprocessor}"`,
+            `"${r.layout}"`,
+            r.avgDcl.toFixed(2),
+            r.avgLoad.toFixed(2)
+        ]);
+
+        const csvContent = '\uFEFF' + [headers.join(';'), ...rows.map(e => e.join(';'))].join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `benchmark_summary_${Date.now()}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    btnRun.addEventListener('click', startExperiment);
+    btnExport.addEventListener('click', exportToCSV);
+})();
+</script>
+
+</body>
+</html>
