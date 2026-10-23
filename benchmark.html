@@ -47,19 +47,27 @@
 
     <!-- Таблица средних значений -->
     <div class="card">
-        <h2>Итоговая сравнительная таблица (средние значения)</h2>
+        <h2>Итоговая сравнительная таблица</h2>
         <table>
             <thead>
                 <tr>
-                    <th>Конфигурация</th>
-                    <th>Препроцессор</th>
-                    <th>Верстка</th>
-                    <th>Формирование DOM (мс)</th>
-                    <th>Полная загрузка / Load (мс)</th>
+                    <th rowspan="2">Конфигурация</th>
+                    <th rowspan="2">Препроцессор</th>
+                    <th rowspan="2">Верстка</th>
+                    <th colspan="3" style="text-align: center; border-bottom: 1px solid #cbd5e1;">Формирование DOM (мс)</th>
+                    <th colspan="3" style="text-align: center; border-bottom: 1px solid #cbd5e1;">Полная загрузка / Load (мс)</th>
+                </tr>
+                <tr>
+                    <th>Среднее</th>
+                    <th>Мин</th>
+                    <th>Макс</th>
+                    <th>Среднее</th>
+                    <th>Мин</th>
+                    <th>Макс</th>
                 </tr>
             </thead>
             <tbody id="summaryBody">
-                <tr><td colspan="5" style="text-align: center; color: #94a3b8;">Запустите тест для формирования статистики...</td></tr>
+                <tr><td colspan="9" style="text-align: center; color: #94a3b8;">Запустите тест для формирования статистики...</td></tr>
             </tbody>
         </table>
     </div>
@@ -190,13 +198,22 @@
                 }
             }
 
+            const minDcl = Math.min(...taskTimes.dcl);
+            const maxDcl = Math.max(...taskTimes.dcl);
             const avgDcl = taskTimes.dcl.reduce((a, b) => a + b, 0) / taskTimes.dcl.length;
+
+            const minLoad = Math.min(...taskTimes.load);
+            const maxLoad = Math.max(...taskTimes.load);
             const avgLoad = taskTimes.load.reduce((a, b) => a + b, 0) / taskTimes.load.length;
 
             summaryResults.push({
                 ...task,
                 avgDcl,
-                avgLoad
+                minDcl,
+                maxDcl,
+                avgLoad,
+                minLoad,
+                maxLoad
             });
         }
 
@@ -215,8 +232,12 @@
                 <td class="text-bold">${item.name}</td>
                 <td>${item.preprocessor}</td>
                 <td>${item.layout}</td>
-                <td>${item.avgDcl.toFixed(2)} мс</td>
-                <td>${item.avgLoad.toFixed(2)} мс</td>
+                <td>${item.avgDcl.toFixed(2)}</td>
+                <td>${item.minDcl.toFixed(2)}</td>
+                <td>${item.maxDcl.toFixed(2)}</td>
+                <td>${item.avgLoad.toFixed(2)}</td>
+                <td>${item.minLoad.toFixed(2)}</td>
+                <td>${item.maxLoad.toFixed(2)}</td>
             `;
             summaryBody.appendChild(tr);
         });
@@ -225,13 +246,28 @@
     function exportToCSV() {
         if (summaryResults.length === 0) return;
 
-        const headers = ['Конфигурация', 'Препроцессор', 'Верстка', 'Формирование DOM (мс)', 'Полная загрузка (мс)'];
+        const headers = [
+            'Конфигурация',
+            'Препроцессор',
+            'Верстка',
+            'DOM Среднее (мс)',
+            'DOM Мин (мс)',
+            'DOM Макс (мс)',
+            'Load Среднее (мс)',
+            'Load Мин (мс)',
+            'Load Макс (мс)'
+        ];
+
         const rows = summaryResults.map(r => [
             `"${r.name}"`,
             `"${r.preprocessor}"`,
             `"${r.layout}"`,
             r.avgDcl.toFixed(2),
-            r.avgLoad.toFixed(2)
+            r.minDcl.toFixed(2),
+            r.maxDcl.toFixed(2),
+            r.avgLoad.toFixed(2),
+            r.minLoad.toFixed(2),
+            r.maxLoad.toFixed(2)
         ]);
 
         const csvContent = '\uFEFF' + [headers.join(';'), ...rows.map(e => e.join(';'))].join('\r\n');
