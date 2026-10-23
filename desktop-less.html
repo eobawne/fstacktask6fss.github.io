@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coeluso - Free PSD Template</title>
-    <!-- <link rel="stylesheet" href="css/main.css"> -->
+    <script>
+        // Сквозная передача cache-buster ко всем стилям на странице
+        (function() {
+            const cb = new URLSearchParams(location.search).get('cb');
+            if (cb) {
+                document.querySelectorAll('link[rel*="stylesheet"]').forEach(function(link) {
+                    const sep = link.href.indexOf('?') === -1 ? '?' : '&';
+                    link.href += sep + 'cb=' + cb;
+                });
+            }
+        })();
+    </script>
     <link rel="stylesheet/less" type="text/css" href="less/desktop.less">
     <script src="https://cdn.jsdelivr.net/npm/less@4.9.1/dist/less.min.js"></script>
 </head>
